@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  react-app:
+    image: ashutoxh/object-detection-react-app
+    container_name: object-detection-react-app
+    ports:
+      - "3000:80"
+    environment:
+      - REACT_APP_YOLO_API=http://yolo-api:5001
+      - REACT_APP_DEPTH_API=http://depth-api:5050
+    depends_on:
+      - yolo-api
+      - depth-api
+    networks:
+      - ai-network
+
+  yolo-api:
+    image: ashutoxh/yolo-v5-flask-app
+    container_name: yolo-v5-flask-app
+    ports:
+      - "5001:5001"
+    networks:
+      - ai-network
+    volumes:
+      - ./yolo-v5-flask-app:/app
+
+  depth-api:
+    image: ashutoxh/depth-anything-flask-app
+    container_name: depth-anything-flask-app
+    ports:
+      - "5050:5050"
+    networks:
+      - ai-network
+    volumes:
+      - ./depth-anything-flask-app:/app
+
+networks:
+  ai-network:
+    driver: bridge
