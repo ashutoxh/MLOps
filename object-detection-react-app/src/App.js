@@ -1,28 +1,21 @@
 import React, { useState } from 'react';
 import './App.css';
 
-// Parse query string parameters
-// Example URL: http://localhost:3000/?yoloapp=http://127.0.0.1:5001&depthapi=http://localhost:5050
-var qs = (function(a) {
-	if (a === "") return {};
-	var b = {};
-	for (var i = 0; i < a.length; ++i)
-	{
-		var p=a[i].split('=', 2);
-		if (p.length === 1)
-			b[p[0]] = "";
-		else
-			b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
-	}
-	return b;
-})(window.location.search.substr(1).split('&'));
+// Get API URLs from either query params or environment variables
+const getApiUrls = () => {
+  // Parse query string parameters
+  const queryParams = new URLSearchParams(window.location.search);
+  const yoloapi = queryParams.get('yoloapi') || process.env.REACT_APP_YOLO_API;
+  const depthapi = queryParams.get('depthapi') || process.env.REACT_APP_DEPTH_API;
 
-console.log("qs object:", qs);
-console.log("qs['yoloapi']:", qs['yoloapi']);
-console.log("qs['depthapi']:", qs['depthapi']);
-console.log("Type of qs['yoloapp']:", typeof qs['yoloapp']);
+  return {
+    yoloapi: yoloapi || 'http://localhost:5001', // Final fallback
+    depthapi: depthapi || 'http://localhost:5050' // Final fallback
+  };
+};
 
 const App = () => {
+  const [apiUrls] = useState(getApiUrls());
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -90,8 +83,7 @@ const App = () => {
       //   body: formData,
       // });
 
-      const baseUrl = qs['yoloapi'];
-      const detectionResponse = await fetch(`${baseUrl}/detect`, {
+      const detectionResponse = await fetch(`${apiUrls.yoloapi}/detect`, {
         method: 'POST',
         body: formData,
       });
@@ -128,8 +120,7 @@ const App = () => {
         //   body: depthFormData,
         // });
 
-        const baseUrl = qs['depthapi'];
-        const depthResponse = await fetch(`${baseUrl}/predict_depth`, {
+        const depthResponse = await fetch(`${apiUrls.depthapi}/predict_depth`, {
           method: 'POST',
           body: depthFormData,
         });
@@ -415,11 +406,11 @@ const App = () => {
         <div className="api-status">
           <div className="api-info">
             <div className="api-indicator"></div>
-            <span>Detection API: POST {qs['yoloapi'] }/detect</span>
+            <span>Detection API: POST {apiUrls.yoloapi}/detect</span>
           </div>
           <div className="api-info">
             <div className="api-indicator depth-indicator"></div>
-            <span>Depth API: POST {qs['depthapi'] }/predict_depth</span>
+            <span>Depth API: POST {apiUrls.depthapi}/predict_depth</span>
           </div>
         </div>
       </div>
