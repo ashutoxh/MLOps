@@ -23,21 +23,10 @@ phases:
       - echo building dev images...
       - docker-compose up -d --build
       - echo building prod images...
-      - >
-        docker build \
-        -f depth-anything-flask-app/Dockerfile \
-        -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/mlops/depth-anything-flask-app:prod \
-        ./depth-anything-flask-app
-      - >
-        docker build \
-        -f object-detection-react-app/Dockerfile \
-        -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/mlops/object-detection-react-app:prod \
-        ./object-detection-react-app
-      - >
-        docker build \
-        -f yolo-v5-flask-app/Dockerfile \
-        -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/mlops/yolo-v5-flask-app:prod \
-        ./yolo-v5-flask-app
+      - docker build -f depth-anything-flask-app/Dockerfile -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/mlops/depth-anything-flask-app:prod ./depth-anything-flask-app
+      - docker build -f object-detection-react-app/Dockerfile -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/mlops/object-detection-react-app:prod ./object-detection-react-app
+      - docker build -f yolo-v5-flask-app/Dockerfile -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/mlops/yolo-v5-flask-app:prod ./yolo-v5-flask-app
+      - wait
       - echo prod images built successfully
   post_build:
     commands:
@@ -45,4 +34,5 @@ phases:
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/mlops/depth-anything-flask-app:prod
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/mlops/object-detection-react-app:prod
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/mlops/yolo-v5-flask-app:prod
+      - wait
       - echo prod images pushed successfully
