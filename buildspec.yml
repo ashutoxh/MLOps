@@ -13,8 +13,7 @@ phases:
   pre_build:
     commands:
       - echo "Logging in to container registries..."
-      - >
-        docker login --username $DOCKERHUB_USERNAME --password-stdin <<< "$DOCKERHUB_PASSWORD"
+      - echo "$DOCKERHUB_PASSWORD" | docker login --username "$DOCKERHUB_USERNAME" --password-stdin
       - echo logging in to ecr...
       - >
         aws ecr get-login-password --region $AWS_REGION \
