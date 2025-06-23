@@ -42,9 +42,9 @@ phases:
       - echo prod images built successfully
   post_build:
     commands:
-    - echo pushing prod images to ecr...
-    - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/mlops/depth-anything-flask-app:prod &
-    - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/mlops/object-detection-react-app:prod &
-    - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/mlops/yolo-v5-flask-app:prod &
-    - wait # Wait for all background jobs to finish
-    - echo prod images pushed successfully
+      - echo pushing prod images to ecr...
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/mlops/depth-anything-flask-app:prod &
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/mlops/object-detection-react-app:prod &
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/mlops/yolo-v5-flask-app:prod &
+      - wait # Wait for all background jobs to finish
+      - echo prod images pushed successfully
