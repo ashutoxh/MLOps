@@ -72,29 +72,100 @@ resource "aws_security_group" "mlops_sg" {
   }
 }
 
-resource "aws_security_group" "ecs_instance_sg" {
-  name        = "ecs-instance-sg"
-  description = "Security group for ECS EC2 instances"
+resource "aws_security_group" "alb_sg" {
+  name        = "mlops-alb-sg"
+  description = "Allow HTTP inbound to ALB"
   vpc_id      = aws_vpc.mlops_vpc.id
 
   ingress {
-    from_port       = 0
-    to_port         = 65535
-    protocol        = "tcp"
-    security_groups = [aws_security_group.mlops_sg.id]  # ALB only
-  }
-
-  ingress {
-    from_port   = 22
-    to_port     = 22
+    description = "HTTP from Internet"
+    from_port   = 80
+    to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]   # Any ssh access
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]   # Full outbound access
+    cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = { Name = "mlops-alb-sg" }
 }
+
+# Instance Security Group
+resource "aws_security_group" "instance_sg" {
+  name        = "mlops-instance-sg"
+  description = "Allow traffic from ALB and SSH"
+  vpc_id      = aws_vpc.mlops_vpc.id
+
+  ingress {
+    description     = "HTTP from ALB"
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    security_groups = [aws_security_group.alb_sg.id]
+  }
+
+  ingress {
+    description     = "YOLO from ALB"
+    from_port       = 5001
+    to_port         = 5001
+    protocol        = "tcp"
+    security_groups = [aws_security_group.alb_sg.id]
+  }
+
+  ingress {
+    description     = "Depth from ALB"
+    from_port       = 5050
+    to_port         = 5050
+    protocol        = "tcp"
+    security_groups = [aws_security_group.alb_sg.id]
+  }
+
+  ingress {
+    description = "SSH"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = { Name = "mlops-instance-sg" }
+}
+
+# resource "aws_security_group" "ecs_instance_sg" {
+#   name        = "ecs-instance-sg"
+#   description = "Security group for ECS EC2 instances"
+#   vpc_id      = aws_vpc.mlops_vpc.id
+
+#   ingress {
+#     from_port       = 0
+#     to_port         = 65535
+#     protocol        = "tcp"
+#     security_groups = [aws_security_group.mlops_sg.id]  # ALB only
+#   }
+
+#   ingress {
+#     from_port   = 22
+#     to_port     = 22
+#     protocol    = "tcp"
+#     cidr_blocks = ["0.0.0.0/0"]   # Any ssh access
+#   }
+
+#   egress {
+#     from_port   = 0
+#     to_port     = 0
+#     protocol    = "-1"
+#     cidr_blocks = ["0.0.0.0/0"]   # Full outbound access
+#   }
+# }

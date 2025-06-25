@@ -27,19 +27,57 @@ resource "aws_ecs_cluster_capacity_providers" "mlops_cluster_providers" {
   }
 }
 
+data "aws_ami" "ecs_ami" {
+  most_recent = true
+  owners      = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-ecs-hvm-*-x86_64-ebs"]
+  }
+}
+
+resource "aws_iam_role" "ecs_instance_role" {
+  name = "ecsInstanceRole"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect = "Allow",
+      Principal = {
+        Service = "ec2.amazonaws.com"
+      },
+      Action = "sts:AssumeRole"
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_attach" {
+  role       = aws_iam_role.ecs_instance_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
+}
+
+resource "aws_iam_instance_profile" "ecs_instance_profile" {
+  name = "ecsInstanceProfile"
+  role = aws_iam_role.ecs_instance_role.name
+}
+
+
 resource "aws_launch_template" "mlops_launch_template" {
   name_prefix   = "mlops-ecs-"
-  image_id      = var.ecs_ami
+  image_id      = data.aws_ami.ecs_ami.id
   instance_type = var.instance_type
   key_name      = "key-devops-class"
 
   network_interfaces {
+    device_index                = 0
     associate_public_ip_address = true
-    security_groups             = [aws_security_group.ecs_instance_sg.id]
+    security_groups             = [aws_security_group.instance_sg.id]
     delete_on_termination       = true
   }
 
-  vpc_security_group_ids = [aws_security_group.ecs_instance_sg.id]
+  iam_instance_profile {
+    name = aws_iam_instance_profile.ecs_instance_profile.name
+  }
 
   user_data = base64encode(<<-EOF
               #!/bin/bash
@@ -70,31 +108,9 @@ resource "aws_autoscaling_group" "mlops_asg" {
   }
 }
 
-resource "aws_iam_role" "ecs_instance_role" {
-  name = "ecs-instance-role"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Principal = {
-          Service = "ec2.amazonaws.com"
-        }
-      }
-    ]
-  })
-}
-
 resource "aws_iam_role_policy_attachment" "ecs_instance_role_policy" {
   role       = aws_iam_role.ecs_instance_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
-}
-
-resource "aws_iam_instance_profile" "ecs_instance_profile" {
-  name = "ecs-instance-profile"
-  role = aws_iam_role.ecs_instance_role.name
 }
 
 resource "aws_iam_role" "ecs_task_execution_role" {

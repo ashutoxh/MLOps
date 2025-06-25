@@ -3,18 +3,18 @@ resource "aws_ecs_task_definition" "react_task" {
   network_mode             = "bridge"
   requires_compatibilities = ["EC2"]
   cpu                      = "512"
-  memory                   = "1024"
+  memory                   = "2048"
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
 
   container_definitions = jsonencode([{
     name      = "react-app"
     image     = var.container_images["react"]
-    cpu       = 256
-    memory    = 512
+    cpu       = 512
+    memory    = 2048
     essential = true
     portMappings = [{
       containerPort = 80
-      hostPort      = 0  # Essential for dynamic port mapping
+      hostPort      = 80
       protocol      = "tcp"
     }]
     logConfiguration = {
@@ -33,14 +33,14 @@ resource "aws_ecs_task_definition" "yolo_task" {
   network_mode             = "bridge"
   requires_compatibilities = ["EC2"]
   cpu                      = "512"
-  memory                   = "1024"
+  memory                   = "2048"
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
 
   container_definitions = jsonencode([{
     name      = "yolo-app"
     image     = var.container_images["yolo"]
-    cpu       = 256
-    memory    = 512
+    cpu       = 512
+    memory    = 2048
     essential = true
     portMappings = [{
       containerPort = 5001
@@ -62,14 +62,14 @@ resource "aws_ecs_task_definition" "depth_task" {
   network_mode             = "bridge"
   requires_compatibilities = ["EC2"]
   cpu                      = "512"
-  memory                   = "1024"
+  memory                   = "2048"
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
 
   container_definitions = jsonencode([{
     name      = "depth-app"
     image     = var.container_images["depth"]
-    cpu       = 256
-    memory    = 512
+    cpu       = 512
+    memory    = 2048
     essential = true
     portMappings = [{
       containerPort = 5050
@@ -98,8 +98,6 @@ resource "aws_ecs_service" "react_service" {
     container_name   = "react-app"
     container_port   = 80
   }
-
-  depends_on = [aws_lb_listener.mlops_listener]
 }
 
 resource "aws_ecs_service" "yolo_service" {
@@ -114,8 +112,6 @@ resource "aws_ecs_service" "yolo_service" {
     container_name   = "yolo-app"
     container_port   = 5001
   }
-
-  depends_on = [aws_lb_listener.mlops_listener]
 }
 
 resource "aws_ecs_service" "depth_service" {
@@ -130,6 +126,4 @@ resource "aws_ecs_service" "depth_service" {
     container_name   = "depth-app"
     container_port   = 5050
   }
-
-  depends_on = [aws_lb_listener.mlops_listener]
 }

@@ -20,19 +20,14 @@ variable "availability_zones" {
   default     = ["us-east-1a", "us-east-1b"]
 }
 
-variable "ecs_ami" {
-  description = "ECS-optimized AMI"
-  default     = "ami-0c7217cdde317cfec" # Amazon ECS-optimized AMI for us-east-1
-}
-
 variable "instance_type" {
   description = "EC2 instance type"
-  default     = "t3.medium"
+  default     = "m4.large"
 }
 
 variable "min_size" {
   description = "Minimum number of EC2 instances"
-  default     = 2
+  default     = 3
 }
 
 variable "max_size" {

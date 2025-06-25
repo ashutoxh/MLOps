@@ -2,7 +2,7 @@ resource "aws_lb" "mlops_alb" {
   name               = "mlops-alb"
   internal           = false
   load_balancer_type = "application"
-  security_groups    = [aws_security_group.mlops_sg.id]
+  security_groups    = [aws_security_group.alb_sg.id]
   subnets            = aws_subnet.mlops_subnets[*].id
 
   enable_deletion_protection = false
@@ -17,10 +17,10 @@ resource "aws_lb_target_group" "react_tg" {
   port        = 80
   protocol    = "HTTP"
   vpc_id      = aws_vpc.mlops_vpc.id
-  target_type = "ip"
+  target_type = "instance"
 
   health_check {
-    path                = "/"
+    path                = "/" 
     port                = "traffic-port"
     interval            = 30
     timeout             = 5
@@ -29,15 +29,15 @@ resource "aws_lb_target_group" "react_tg" {
   }
 }
 
+
 resource "aws_lb_target_group" "yolo_tg" {
   name        = "yolo-tg"
   port        = 5001
   protocol    = "HTTP"
   vpc_id      = aws_vpc.mlops_vpc.id
-  target_type = "ip"
-
+  target_type = "instance"
   health_check {
-    path                = "/"
+    path                = "/health"
     port                = "traffic-port"
     interval            = 30
     timeout             = 5
@@ -51,10 +51,9 @@ resource "aws_lb_target_group" "depth_tg" {
   port        = 5050
   protocol    = "HTTP"
   vpc_id      = aws_vpc.mlops_vpc.id
-  target_type = "ip"
-
+  target_type = "instance"
   health_check {
-    path                = "/"
+    path                = "/health"
     port                = "traffic-port"
     interval            = 30
     timeout             = 5
@@ -85,7 +84,7 @@ resource "aws_lb_listener_rule" "yolo_rule" {
 
   condition {
     path_pattern {
-      values = ["/yolo*"]
+      values = ["/yolo*", "/yolo/*"]
     }
   }
 }
@@ -101,7 +100,7 @@ resource "aws_lb_listener_rule" "depth_rule" {
 
   condition {
     path_pattern {
-      values = ["/depth*"]
+      values = ["/depth*", "/depth/*"]
     }
   }
 }

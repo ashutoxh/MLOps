@@ -25,7 +25,7 @@ output "depth_service_url" {
 
 output "ecs_instance_security_group_id" {
   description = "ECS Instance Security Group ID"
-  value       = aws_security_group.ecs_instance_sg.id
+  value       = aws_security_group.mlops_sg.id
 }
 
 output "alb_security_group_id" {
