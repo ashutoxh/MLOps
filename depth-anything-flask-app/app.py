@@ -193,7 +193,7 @@ def encode_image_to_base64(img_array):
     except Exception as e:
         raise Exception(f"Error encoding image: {e}")
 
-@app.route('/predict_depth', methods=['POST'])
+@app.route('/depth/predict_depth', methods=['POST'])
 def predict_depth():
     """Main endpoint for depth prediction with object midpoints"""
     try:
@@ -292,7 +292,7 @@ def predict_depth():
         traceback.print_exc()
         return jsonify({'error': f'Depth prediction failed: {str(e)}'}), 500
 
-@app.route('/model-info', methods=['GET'])
+@app.route('/depth/model-info', methods=['GET'])
 def model_info():
     """Get information about the loaded depth model"""
     if depth_model is None:
@@ -305,7 +305,7 @@ def model_info():
         'checkpoint_exists': os.path.exists(DEPTH_CONFIG['checkpoint_path'])
     }), 200
 
-@app.route('/health', methods=['GET'])
+@app.route('/depth/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""
     return jsonify({

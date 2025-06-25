@@ -22,8 +22,8 @@ npm start
 
 ## Required APIs
 
-- **YOLOv5 API**: `POST /detect` - Object detection
-- **Depth API**: `POST /predict_depth` - Depth prediction
+- **YOLOv5 API**: `POST /yolo/detect` - Object detection
+- **Depth API**: `POST /depth/predict_depth` - Depth prediction
 
 ## Features
 

@@ -37,7 +37,7 @@ variable "max_size" {
 
 variable "desired_capacity" {
   description = "Desired number of EC2 instances"
-  default     = 2
+  default     = 3
 }
 
 variable "container_images" {

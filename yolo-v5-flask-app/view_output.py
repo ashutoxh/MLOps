@@ -177,7 +177,7 @@ def quick_test():
     
     try:
         response = requests.post(
-            f"{base_url}/detect",
+            f"{base_url}/yolo/detect",
             json={"docarray_json": docarray_json}
         )
         

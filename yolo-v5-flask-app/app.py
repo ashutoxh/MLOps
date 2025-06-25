@@ -197,7 +197,7 @@ def encode_image_to_base64(img_array):
     except Exception as e:
         raise Exception(f"Error encoding image: {e}")
 
-@app.route('/detect', methods=['POST'])
+@app.route('/yolo/detect', methods=['POST'])
 def detect_objects():
     """Main endpoint for object detection"""
     try:
@@ -257,7 +257,7 @@ def detect_objects():
         print(f"Error in object detection: {str(e)}")
         return jsonify({'error': f'Detection failed: {str(e)}'}), 500
 
-@app.route('/model-info', methods=['GET'])
+@app.route('/yolo/model-info', methods=['GET'])
 def model_info():
     """Get information about the loaded model"""
     if model is None:
@@ -271,7 +271,7 @@ def model_info():
         'config': YOLO_CONFIG
     }), 200
 
-@app.route('/health', methods=['GET'])
+@app.route('/yolo/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""
     return jsonify({

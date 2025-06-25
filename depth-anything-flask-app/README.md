@@ -36,9 +36,9 @@ API runs on `http://localhost:5050`
 
 ## Endpoints
 
-- `POST /predict_depth` - Depth prediction with object midpoints
-- `GET /model-info` - Model information  
-- `GET /health` - Health check
+- `POST /depth/predict_depth` - Depth prediction with object midpoints
+- `GET /depth/model-info` - Model information  
+- `GET /depth/health` - Health check
 
 ## Usage
 

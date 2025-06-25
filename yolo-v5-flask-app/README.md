@@ -19,9 +19,9 @@ API runs on `http://127.0.0.1:5001`
 
 ## Endpoints
 
-- `POST /detect` - Upload image for object detection
-- `GET /health` - Health check
-- `GET /model-info` - Model information
+- `POST /yolo/detect` - Upload image for object detection
+- `GET /yolo/health` - Health check
+- `GET /yolo/model-info` - Model information
 
 ## Response Format
 

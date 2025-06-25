@@ -20,7 +20,7 @@ resource "aws_lb_target_group" "react_tg" {
   target_type = "instance"
 
   health_check {
-    path                = "/" 
+    path                = "/healthcheck.txt" 
     port                = "traffic-port"
     interval            = 30
     timeout             = 5
@@ -37,7 +37,7 @@ resource "aws_lb_target_group" "yolo_tg" {
   vpc_id      = aws_vpc.mlops_vpc.id
   target_type = "instance"
   health_check {
-    path                = "/health"
+    path                = "/yolo/health"
     port                = "traffic-port"
     interval            = 30
     timeout             = 5
@@ -53,7 +53,7 @@ resource "aws_lb_target_group" "depth_tg" {
   vpc_id      = aws_vpc.mlops_vpc.id
   target_type = "instance"
   health_check {
-    path                = "/health"
+    path                = "/depth/health"
     port                = "traffic-port"
     interval            = 30
     timeout             = 5
@@ -84,7 +84,7 @@ resource "aws_lb_listener_rule" "yolo_rule" {
 
   condition {
     path_pattern {
-      values = ["/yolo*", "/yolo/*"]
+      values = ["/yolo/*"]
     }
   }
 }
@@ -100,7 +100,7 @@ resource "aws_lb_listener_rule" "depth_rule" {
 
   condition {
     path_pattern {
-      values = ["/depth*", "/depth/*"]
+      values = ["/depth/*"]
     }
   }
 }

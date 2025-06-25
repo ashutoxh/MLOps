@@ -114,7 +114,7 @@ const App = () => {
       //   body: formData,
       // });
 
-      const detectionResponse = await fetch(`${apiUrls.yoloapi}/detect`, {
+      const detectionResponse = await fetch(`${apiUrls.yoloapi}/yolo/detect`, {
         method: 'POST',
         body: formData,
       });
@@ -151,7 +151,7 @@ const App = () => {
         //   body: depthFormData,
         // });
 
-        const depthResponse = await fetch(`${apiUrls.depthapi}/predict_depth`, {
+        const depthResponse = await fetch(`${apiUrls.depthapi}/depth/predict_depth`, {
           method: 'POST',
           body: depthFormData,
         });
@@ -441,11 +441,11 @@ const App = () => {
         <div className="api-status">
           <div className="api-info">
             <div className="api-indicator"></div>
-            <span>Detection API: POST {apiUrls.yoloapi}/detect</span>
+            <span>Detection API: POST {apiUrls.yoloapi}/yolo/detect</span>
           </div>
           <div className="api-info">
             <div className="api-indicator depth-indicator"></div>
-            <span>Depth API: POST {apiUrls.depthapi}/predict_depth</span>
+            <span>Depth API: POST {apiUrls.depthapi}/depth/predict_depth</span>
           </div>
         </div>
       </div>
