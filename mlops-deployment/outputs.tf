@@ -32,3 +32,7 @@ output "alb_security_group_id" {
   description = "ALB Security Group ID"
   value       = aws_security_group.mlops_sg.id
 }
+
+output "react_config_url" {
+  value = "https://${aws_s3_bucket.react_config_bucket.bucket}.s3.amazonaws.com/config.json"
+}

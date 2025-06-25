@@ -1,0 +1,4 @@
+{
+  "REACT_APP_YOLO_API": "http://<<ALB>>/yolo",
+  "REACT_APP_DEPTH_API": "http://<<ALB>>/depth"
+}

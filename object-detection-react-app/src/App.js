@@ -1,29 +1,60 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 
-// Get API URLs from either query params or environment variables
-const getApiUrls = () => {
-  // Parse query string parameters
-  const queryParams = new URLSearchParams(window.location.search);
-  const yoloapi = queryParams.get('yoloapi') || process.env.REACT_APP_YOLO_API;
-  const depthapi = queryParams.get('depthapi') || process.env.REACT_APP_DEPTH_API;
-
-  return {
-    yoloapi: yoloapi || 'http://localhost:5001', // Final fallback
-    depthapi: depthapi || 'http://localhost:5050' // Final fallback
-  };
-};
+const CONFIG_URL = "https://react-runtime-config-mlops.s3.amazonaws.com/config.json";
 
 const App = () => {
-  const [apiUrls] = useState(getApiUrls());
+  const [apiUrls, setApiUrls] = useState({ yoloapi: '', depthapi: '' });
+  const [configLoaded, setConfigLoaded] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    fetch(CONFIG_URL)
+      .then(res => res.json())
+      .then(config => {
+        setApiUrls({
+          yoloapi: config.REACT_APP_YOLO_API || 'http://localhost:5001',
+          depthapi: config.REACT_APP_DEPTH_API || 'http://localhost:5050'
+        });
+        setConfigLoaded(true);
+      })
+      .catch(error => {
+        console.error("Failed to load config:", error);
+        setApiUrls({
+          yoloapi: 'http://localhost:5001',
+          depthapi: 'http://localhost:5050'
+        });
+        setConfigLoaded(true);
+      });
+  }, []);
+
   const [status, setStatus] = useState('');
   const [detectionResults, setDetectionResults] = useState(null);
   const [depthResults, setDepthResults] = useState(null);
   const [annotatedImageUrl, setAnnotatedImageUrl] = useState(null);
   const [depthVisualizationUrl, setDepthVisualizationUrl] = useState(null);
+
+  useEffect(() => {
+    fetch(CONFIG_URL)
+      .then(res => res.json())
+      .then(config => {
+        setApiUrls({
+          yoloapi: config.REACT_APP_YOLO_API || 'http://localhost:5001',
+          depthapi: config.REACT_APP_DEPTH_API || 'http://localhost:5050'
+        });
+        setConfigLoaded(true);
+      })
+      .catch(error => {
+        console.error("Failed to load config:", error);
+        setApiUrls({
+          yoloapi: 'http://localhost:5001',
+          depthapi: 'http://localhost:5050'
+        });
+        setConfigLoaded(true);
+      });
+  }, []);
 
   const handleImageSelect = (event) => {
     const file = event.target.files[0];
@@ -255,6 +286,10 @@ const App = () => {
       </div>
     );
   };
+
+  if (!configLoaded) {
+      return <div className="app">Loading configuration...</div>;
+  }
 
   return (
     <div className="app">
