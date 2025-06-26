@@ -1,55 +1,74 @@
-# Final Project
+# MLOps Final Project: End-to-End Image Analysis Pipeline on AWS
 
-## Steps
+## Overview
 
-cd object-detection-react-app && docker build . -t ashutoxh/object-detection-react-app
-cd object-detection-react-app && docker push ashutoxh/object-detection-react-app
-cd yolo-v5-flask-app && docker build . -t ashutoxh/yolo-v5-flask-app
+This project deploys a full-stack machine learning pipeline on AWS using Flask (for YOLOv5 and depth estimation), React (frontend), and Terraform (for infrastructure automation). The pipeline is built for object detection and depth prediction in images uploaded through a web interface.
 
-cd yolo-v5-flask-app && docker push ashutoxh/yolo-v5-flask-app
-cd depth-anything-flask-app && docker build . -t ashutoxh/depth-anything-flask-app
-cd depth-anything-flask-app && docker push ashutoxh/depth-anything-flask-app
+---
 
-In yolo, had to change 127.0.0.0 to 0.0.0.0
+## 📁 Project Structure
 
-## dev build
+```
+final-project/
+├── depth-anything-flask-app/        # Flask app for MiDaS-based depth estimation
+├── mlops-deployment/                # All Terraform IaC files (VPC, ECS, ALB, S3, etc.)
+├── object-detection-react-app/      # React frontend
+├── yolo-v5-flask-app/               # Flask app for YOLOv5 object detection
+├── buildspec.yml                    # CodeBuild spec for CI/CD
+├── docker-compose.yml              # For local multi-container testing
+└── README.md
+```
 
-docker build \
--f depth-anything-flask-app/Dockerfile \
--t 680604704378.dkr.ecr.us-east-1.amazonaws.com/mlops/depth-anything-flask-app:dev \
-./depth-anything-flask-app
+---
 
-docker build \
--f object-detection-react-app/Dockerfile \
--t 680604704378.dkr.ecr.us-east-1.amazonaws.com/mlops/object-detection-react-app:dev \
-./object-detection-react-app
+## 🚀 Deployment Flow
 
-docker build \
--f yolo-v5-flask-app/Dockerfile \
--t 680604704378.dkr.ecr.us-east-1.amazonaws.com/mlops/yolo-v5-flask-app:dev \
-./yolo-v5-flask-app
+1. **Build & Push Docker Images**
+   - YOLO and depth Flask apps
+   - React frontend
+   - Push to Amazon ECR
 
-## login
+2. **Terraform Infrastructure Setup**
+   - Run `terraform apply` from `mlops-deployment/` to provision:
+     - VPC, subnets, security groups
+     - ECS cluster and task definitions
+     - ALB and target groups with listener rules
+     - S3 bucket for config
 
-aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 680604704378.dkr.ecr.us-east-1.amazonaws.com
+3. **Application Access**
+   - React app runs on root `/`
+   - YOLOv5 app is routed via `/yolo/*`
+   - Depth estimation is routed via `/depth/*`
 
-## dev push
-docker push 680604704378.dkr.ecr.us-east-1.amazonaws.com/mlops/depth-anything-flask-app:dev
-docker push 680604704378.dkr.ecr.us-east-1.amazonaws.com/mlops/object-detection-react-app:dev
-docker push 680604704378.dkr.ecr.us-east-1.amazonaws.com/mlops/yolo-v5-flask-app:dev
+4. **CI/CD**
+   - AWS CodeBuild automates image building and pushing
 
-## prod push 
-docker build \
-  -f depth-anything-flask-app/Dockerfile \
-  -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/mlops/depth-anything-flask-app:prod \
-  ./depth-anything-flask-app
+---
 
-docker build \
-  -f object-detection-react-app/Dockerfile \
-  -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/mlops/object-detection-react-app:prod \
-  ./object-detection-react-app
+## 📦 APIs
 
-docker build \
-  -f yolo-v5-flask-app/Dockerfile \
-  -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/mlops/yolo-v5-flask-app:prod \
-  ./yolo-v5-flask-app
+| Endpoint                    | Method | Description                      |
+|----------------------------|--------|----------------------------------|
+| `/yolo/health`             | GET    | YOLOv5 health check              |
+| `/yolo/detect`             | POST   | Runs object detection            |
+| `/depth/health`            | GET    | Depth API health check           |
+| `/depth/predict_depth`     | POST   | Performs depth estimation        |
+
+---
+
+## ✅ Health Check Verification
+
+You can verify that your services are running by curling from inside the EC2 instance:
+
+```bash
+curl http://localhost:5001/yolo/health
+curl http://localhost:5050/depth/health
+```
+
+---
+
+## 🔐 Note
+
+The ALB listener rules forward to the appropriate target groups based on `/yolo/*` or `/depth/*` path pattern.
+
+---
