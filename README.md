@@ -19,13 +19,21 @@ This infrastructure is built entirely using **Terraform**, ensuring 100% Infrast
 - **S3 Bucket**: Provisioned via `s3bucket.tf` for object storage needs.
 - **Outputs and Variables**: Dynamically managed using `outputs.tf` and `variables.tf` for reusability and modularity.
 
-This architecture is fully cloud-native, scalable, and maintainable through declarative Terraform configurations.
+### 🔄 CI/CD Integration
+
+A `buildspec.yml` file is used with **AWS CodeBuild** to automate the production build process. On each commit or tag push, CodeBuild triggers a build pipeline that:
+
+- Builds the application Docker image
+- Tags it appropriately for production
+- Pushes it to **Amazon ECR**
+- The ECS service then pulls the latest image from ECR via the app task definition
+
+This ensures a smooth, automated path from code to containerized deployment in a scalable cloud-native environment.
 
 ---
 
 ## 📁 Project Structure
 
-```
 final-project/
 ├── depth-anything-flask-app/        # Flask app for MiDaS-based depth estimation
 ├── mlops-deployment/                # All Terraform IaC files (VPC, ECS, ALB, S3, etc.)
@@ -34,7 +42,7 @@ final-project/
 ├── buildspec.yml                    # CodeBuild spec for CI/CD
 ├── docker-compose.yml              # For local multi-container testing
 └── README.md
-```
+
 ---
 
 ## 🚀 Deployment Flow
