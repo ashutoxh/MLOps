@@ -6,6 +6,23 @@ This project deploys a full-stack machine learning pipeline on AWS using Flask (
 
 ---
 
+## 🧱 Architecture Overview
+
+This infrastructure is built entirely using **Terraform**, ensuring 100% Infrastructure as Code (IaC) with reproducibility and version control.
+
+### 🚀 Key Components
+
+- **VPC & Networking**: Custom VPC with public and private subnets, route tables, internet gateway, and NAT gateway, all managed via `network.tf`.
+- **ECS Cluster**: Elastic Container Service (ECS) configured using `ecs.tf`, supporting Fargate for containerized workloads.
+- **Task Definitions & Services**: ECS task definitions and services defined in `tasks.tf`, enabling scalable application deployment.
+- **Application Load Balancer (ALB)**: Defined in `loadbalancer.tf`, includes target groups and listeners for traffic routing to ECS services.
+- **S3 Bucket**: Provisioned via `s3bucket.tf` for object storage needs.
+- **Outputs and Variables**: Dynamically managed using `outputs.tf` and `variables.tf` for reusability and modularity.
+
+This architecture is fully cloud-native, scalable, and maintainable through declarative Terraform configurations.
+
+---
+
 ## 📁 Project Structure
 
 ```
@@ -18,7 +35,6 @@ final-project/
 ├── docker-compose.yml              # For local multi-container testing
 └── README.md
 ```
-
 ---
 
 ## 🚀 Deployment Flow
@@ -67,8 +83,94 @@ curl http://localhost:5050/depth/health
 
 ---
 
-## 🔐 Note
+## 🔧 Local DockerHub Build & Push
 
-The ALB listener rules forward to the appropriate target groups based on `/yolo/*` or `/depth/*` path pattern.
+```bash
+# Build and push object-detection-react-app
+cd object-detection-react-app
+docker build . -t ashutoxh/object-detection-react-app
+docker push ashutoxh/object-detection-react-app
+
+# Build and push yolo-v5-flask-app
+cd ../yolo-v5-flask-app
+docker build . -t ashutoxh/yolo-v5-flask-app
+docker push ashutoxh/yolo-v5-flask-app
+
+# Build and push depth-anything-flask-app
+cd ../depth-anything-flask-app
+docker build . -t ashutoxh/depth-anything-flask-app
+docker push ashutoxh/depth-anything-flask-app
+```
+
+---
+
+## 🧪 Development Build (AWS ECR)
+
+### ✅ Login to AWS ECR
+
+```bash
+aws ecr get-login-password --region us-east-1 \
+| docker login --username AWS \
+--password-stdin <AWSID>.dkr.ecr.us-east-1.amazonaws.com
+```
+
+### 🐳 Build dev images
+
+```bash
+docker build -f depth-anything-flask-app/Dockerfile \
+  -t <AWSID>.dkr.ecr.us-east-1.amazonaws.com/mlops/depth-anything-flask-app:dev \
+  ./depth-anything-flask-app
+
+docker build -f object-detection-react-app/Dockerfile \
+  -t <AWSID>.dkr.ecr.us-east-1.amazonaws.com/mlops/object-detection-react-app:dev \
+  ./object-detection-react-app
+
+docker build -f yolo-v5-flask-app/Dockerfile \
+  -t <AWSID>.dkr.ecr.us-east-1.amazonaws.com/mlops/yolo-v5-flask-app:dev \
+  ./yolo-v5-flask-app
+```
+
+### 📤 Push dev images
+
+```bash
+docker push <AWSID>.dkr.ecr.us-east-1.amazonaws.com/mlops/depth-anything-flask-app:dev
+docker push <AWSID>.dkr.ecr.us-east-1.amazonaws.com/mlops/object-detection-react-app:dev
+docker push <AWSID>.dkr.ecr.us-east-1.amazonaws.com/mlops/yolo-v5-flask-app:dev
+```
+
+---
+
+## 🚀 Production Build & Push (AWS ECR)
+
+> Make sure `$AWS_ACCOUNT_ID` and `$AWS_REGION` are exported in your environment.
+
+```bash
+docker build -f depth-anything-flask-app/Dockerfile \
+  -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/mlops/depth-anything-flask-app:prod \
+  ./depth-anything-flask-app
+
+docker build -f object-detection-react-app/Dockerfile \
+  -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/mlops/object-detection-react-app:prod \
+  ./object-detection-react-app
+
+docker build -f yolo-v5-flask-app/Dockerfile \
+  -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/mlops/yolo-v5-flask-app:prod \
+  ./yolo-v5-flask-app
+```
+
+```bash
+# Push the prod images
+docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/mlops/depth-anything-flask-app:prod
+docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/mlops/object-detection-react-app:prod
+docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/mlops/yolo-v5-flask-app:prod
+```
+
+---
+
+## ⚠️ Notes
+
+- `yolo-v5-flask-app` required changing `127.0.0.1` to `0.0.0.0` in app code to allow Docker network access.
+- AWS CodeBuild timeout was increased from **10 minutes** to **30 minutes** to support large image builds.
+- The ALB listener rules forward to the appropriate target groups based on `/yolo/*` or `/depth/*` path pattern.
 
 ---
