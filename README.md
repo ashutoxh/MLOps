@@ -34,6 +34,7 @@ This ensures a smooth, automated path from code to containerized deployment in a
 
 ## 📁 Project Structure
 
+```text
 final-project/
 ├── depth-anything-flask-app/        # Flask app for MiDaS-based depth estimation
 ├── mlops-deployment/                # All Terraform IaC files (VPC, ECS, ALB, S3, etc.)
@@ -42,6 +43,7 @@ final-project/
 ├── buildspec.yml                    # CodeBuild spec for CI/CD
 ├── docker-compose.yml              # For local multi-container testing
 └── README.md
+```
 
 ---
 
