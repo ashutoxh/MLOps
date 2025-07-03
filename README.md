@@ -10,6 +10,10 @@ This project deploys a full-stack machine learning pipeline on AWS using Flask (
 
 This infrastructure is built entirely using **Terraform**, ensuring 100% Infrastructure as Code (IaC) with reproducibility and version control.
 
+![MLOps screenshot](assets/screenshot.png)
+
+Figure: End-to-End MLOps Pipeline Architecture on AWS
+
 ### 🚀 Key Components
 
 - **VPC & Networking**: Custom VPC with public and private subnets, route tables, internet gateway, and NAT gateway, all managed via `network.tf`.
