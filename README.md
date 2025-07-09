@@ -6,6 +6,12 @@ This project deploys a full-stack machine learning pipeline on AWS using Flask (
 
 ---
 
+## ✍️ Authorship & Contributions
+
+Note: The machine learning models (YOLOv5 and depth estimation), Flask APIs, and the React frontend code were provided by the course instructor. My primary contribution to this project lies in the DevOps and MLOps engineering — designing and implementing the complete AWS infrastructure using Terraform, configuring ECS deployments, setting up CI/CD pipelines with CodeBuild, and containerizing the applications for scalable cloud deployment.
+
+---
+
 ## 🧱 Architecture Overview
 
 This infrastructure is built entirely using **Terraform**, ensuring 100% Infrastructure as Code (IaC) with reproducibility and version control.
